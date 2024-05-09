@@ -17,22 +17,25 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/time.h>
+#include <pthread.h>
 
-typedef struct { int ini; int fin; int m; int a; } myarg_t;
+typedef struct { int ini; int fin; } myarg_t;
 
 double* X;
 double* Y;
 double* Y_avgs;
+double a;
 
-void calcularSAXPY(void *arg){
+void *calcularSAXPY(void *arg){
     int i, it;
 	myarg_t *args = (myarg_t *) arg;
-	for(it = 0; it < args->m; it++){
+	for(it = 0; it < 1000; it++){
 		for(i = args->ini; i < args->fin; i++){
-			Y[i] = Y[i] + args->a * X[i];
+			Y[i] = Y[i] + a * X[i];
 			Y_avgs[it] += Y[i];
 		}
 	}
+	return NULL;
 }
 
 int main(int argc, char* argv[]){
@@ -43,8 +46,8 @@ int main(int argc, char* argv[]){
   	int max_iters = 1000;
   	// Variables to perform SAXPY operation
 	
-	double a;
-	int i, it, t;
+	
+	int i, t;
 	// Variables to get execution time
 	struct timeval t_start, t_end;
 	double exec_time;
@@ -120,12 +123,12 @@ int main(int argc, char* argv[]){
 	//SAXPY iterative SAXPY mfunction
 	pthread_t hilo1;
 	pthread_t hilo2;
-	myarg_t args1 = { 0, 5000000, max_iters, a };
-	myarg_t args2 = { 5000000, p, max_iters, a};
-	Pthread_create(&hilo1, NULL, calcularSAXPY, &args1);
-	Pthread_create(&hilo2, NULL, calcularSAXPY, &args2);
-	Pthread_join(hilo1, NULL);
-	Pthread_join(hilo2, NULL);
+	myarg_t args1 = { 0, 5000000 };
+	myarg_t args2 = { 5000000, 10000000 };
+	pthread_create(&hilo1, NULL, calcularSAXPY, &args1);
+	pthread_create(&hilo2, NULL, calcularSAXPY, &args2);
+	pthread_join(hilo1, NULL);
+	pthread_join(hilo2, NULL);
 
 	for(t = 0; t < max_iters; t++){
 		Y_avgs[t] = Y_avgs[t] / p;
