@@ -44,7 +44,7 @@ int main(int argc, char* argv[]){
 	// Variables to obtain command line parameters
 	unsigned int seed = 1;
   	int p = 10000000;
-  	int n_threads = 2;
+  	int n_threads = 16;
   	int max_iters = 1000;
   	// Variables to perform SAXPY operation
 	
